@@ -316,7 +316,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/secrets
   version: 0.1.0
-  installed: true
+  installed: false
   values:
   - values/opensearch/secrets.yaml.gotmpl
 
@@ -327,7 +327,7 @@ releases:
     group: opensearch
   chart: ./upstream/opensearch
   version: 2.6.0
-  installed: true
+  installed: false
   wait: true
   needs:
   {{- if .Values.opensearch.sso.enabled }}
@@ -345,7 +345,7 @@ releases:
     group: opensearch
   chart: ./upstream/opensearch
   version: 2.6.0
-  installed: {{ .Values.opensearch.dataNode.dedicatedPods }}
+  installed: false
   wait: true
   needs:
   - opensearch-system/opensearch-master
@@ -360,7 +360,7 @@ releases:
     group: opensearch
   chart: ./upstream/opensearch
   version: 2.6.0
-  installed: {{ .Values.opensearch.clientNode.dedicatedPods }}
+  installed: false
   wait: true
   needs:
   - opensearch-system/opensearch-master
@@ -375,7 +375,7 @@ releases:
     group: opensearch
   chart: ./upstream/opensearch-dashboards
   version: 2.5.1
-  installed: true
+  installed: false
   wait: true
   needs:
   - opensearch-system/opensearch-master
@@ -389,7 +389,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/backup
   version: 0.1.0
-  installed: {{ .Values.opensearch.snapshot.enabled }}
+  installed: false
   missingFileHandler: Error
   needs:
   - opensearch-system/opensearch-configurer
@@ -403,7 +403,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/slm
   version: 0.1.0
-  installed: {{ .Values.opensearch.snapshot.enabled }}
+  installed: false
   missingFileHandler: Error
   needs:
   - opensearch-system/opensearch-configurer
@@ -417,7 +417,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/curator
   version: 0.1.0
-  installed: {{ .Values.opensearch.curator.enabled }}
+  installed: false
   missingFileHandler: Error
   needs:
   - opensearch-system/opensearch-configurer
@@ -431,7 +431,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/securityadmin
   version: 0.1.0
-  installed: {{ .Values.opensearch.securityadmin.enabled }}
+  installed: false
   needs:
   - opensearch-system/opensearch-master
 {{- if .Values.opensearch.dataNode.dedicatedPods }}
@@ -450,7 +450,7 @@ releases:
     group: opensearch
   chart: ./charts/opensearch/configurer
   version: 0.1.0
-  installed: true
+  installed: false
   needs:
   {{- if .Values.opensearch.securityadmin.enabled }}
   - opensearch-system/opensearch-securityadmin
@@ -470,7 +470,7 @@ releases:
     group: opensearch
   chart: ./upstream/prometheus-elasticsearch-exporter
   version: 4.11.0
-  installed: true
+  installed: false
   missingFileHandler: Error
   needs:
   - opensearch-system/opensearch-configurer
