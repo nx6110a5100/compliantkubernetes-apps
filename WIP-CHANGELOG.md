@@ -14,6 +14,8 @@
 - Compaction for logs stored directly in object store by Fluentd
 - New 'Log review overview' Opensearch dashboard
 - Added falco rules to ignore redis operator related alerts.
+- Added the option to set ingress Nginx as deployment.
+- Added option to use service type NodePort for ingress nginx.
 
 ### Fixed
 

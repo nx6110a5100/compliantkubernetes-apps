@@ -358,6 +358,8 @@ externalTrafficPolicy:
 ## Nginx ingress controller configuration
 ingressNginx:
   controller:
+    kind: DaemonSet
+    replicaCount: 2
     allowSnippetAnnotations: false
     resources:
       requests:
@@ -369,6 +371,13 @@ ingressNginx:
     tolerations: []
     affinity: {}
     nodeSelector: {}
+    topologySpreadConstraints:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/component: controller
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
     enablepublishService: false
     config:
       ## If 'true', use PROXY protocol
@@ -393,6 +402,13 @@ ingressNginx:
       ## Whitelist IP address for octavia loadbalancer
       ## ref: https://github.com/kubernetes/cloud-provider-openstack/blob/master/docs/openstack-cloud-controller-manager/expose-applications-using-loadbalancer-type-service.md#restrict-access-for-loadbalancer-service
       loadBalancerSourceRanges: []
+
+      ## type: NodePort
+      nodePorts:
+        http: "30080"
+        https: "30443"
+        tcp: {}
+        udp: {}
 
     ## Additional configuration options for Nginx
     ## ref: https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/

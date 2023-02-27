@@ -53,7 +53,11 @@ controller:
 
   ## DaemonSet or Deployment
   ##
-  kind: DaemonSet
+  kind: {{ .Values.ingressNginx.controller.kind }}
+
+  {{ if and ( eq .Values.ingressNginx.controller.kind "Deployment" ) }}
+  replicaCount: {{ .Values.ingressNginx.controller.replicaCount }}
+  {{ end }}
 
   # The update strategy to apply to the Deployment or DaemonSet
   ##
@@ -85,6 +89,13 @@ controller:
   ##
   nodeSelector: {{- toYaml .Values.ingressNginx.controller.nodeSelector | nindent 4 }}
 
+  # -- Topology spread constraints rely on node labels to identify the topology domain(s) that each Node is in.
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  ##
+  {{ if eq .Values.ingressNginx.controller.kind "Deployment" }}
+  topologySpreadConstraints: {{- toYaml .Values.ingressNginx.controller.topologySpreadConstraints | nindent 4 }}
+  {{- end }}
+
   # Define requests resources to avoid probe issues due to CPU utilization in busy nodes
   # ref: https://github.com/kubernetes/ingress-nginx/issues/4735#issuecomment-551204903
   # Ideally, there should be no limits.
@@ -106,6 +117,9 @@ controller:
     loadBalancerSourceRanges: {{- toYaml .Values.ingressNginx.controller.service.loadBalancerSourceRanges | nindent 6 }}
     {{ else }}
     enabled: false
+    {{ end }}
+    {{ if eq .Values.ingressNginx.controller.service.type "NodePort" }}
+    nodePorts: {{- toYaml .Values.ingressNginx.controller.service.nodePorts | nindent 6 }}
     {{ end }}
 
   metrics:

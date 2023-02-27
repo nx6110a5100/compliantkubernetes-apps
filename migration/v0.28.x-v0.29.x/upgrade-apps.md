@@ -33,6 +33,27 @@
     ./bin/ck8s init
     ```
 
+1. **Optional** Configure ingress nginx:
+
+    It is now possible from the config to run ingress nginx as a deployment and use NodePort.
+
+    There is an default topologySpread for the controller.
+
+    ```yaml
+    # Use Deployment instead
+    kind: Deployment
+    replicaCount: 2
+
+    # Use NodePort instead
+    useHostPort: false
+    service:
+      enabled: true
+      type: NodePort
+      nodePorts:
+        http: 30080
+        https: 30443
+    ```
+
 1. Reconfigure fluentd:
 
     ```bash
