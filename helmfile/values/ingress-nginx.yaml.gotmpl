@@ -55,7 +55,7 @@ controller:
   ##
   kind: {{ .Values.ingressNginx.controller.kind }}
 
-  {{ if and ( eq .Values.ingressNginx.controller.kind "Deployment" ) }}
+  {{ if eq .Values.ingressNginx.controller.kind "Deployment" }}
   replicaCount: {{ .Values.ingressNginx.controller.replicaCount }}
   {{ end }}
 
