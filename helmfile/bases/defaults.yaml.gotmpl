@@ -1,0 +1,33 @@
+missingFileHandler: Error
+
+helmDefaults:
+  createNamespace: false
+  skipDeps: true
+  timeout: 600
+
+environments:
+  service:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/sc-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/sc-config.yaml"
+      - ck8sServiceCluster:
+          enabled: true
+      - ck8sWorkloadCluster:
+          enabled: false
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"
+
+  workload:
+    values:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/defaults/wc-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/common-config.yaml"
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/wc-config.yaml"
+      - ck8sServiceCluster:
+          enabled: false
+      - ck8sWorkloadCluster:
+          enabled: true
+    secrets:
+      - "{{ requiredEnv "CK8S_CONFIG_PATH" }}/secrets.yaml"

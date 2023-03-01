@@ -1,0 +1,5 @@
+bases:
+  - helmfile/bases/defaults.yaml.gotmpl
+
+helmfiles:
+  - path: helmfile/stages/10-app-main.yaml.gotmpl

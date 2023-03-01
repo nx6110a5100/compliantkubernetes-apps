@@ -1,0 +1,139 @@
+commonLabels:
+  group: logging
+  stack: opensearch
+
+templates:
+  opensearchSecrets:
+    name: opensearch-secrets
+    namespace: opensearch-system
+    condition: ck8sServiceCluster.enabled
+    chart: ../charts/opensearch/secrets
+    version: 0.1.0
+    values:
+      - ../values/opensearch/secrets.yaml.gotmpl
+
+  # Common for opensearch-master/data/client
+  opensearch:
+    namespace: opensearch-system
+    condition: ck8sServiceCluster.enabled
+    chart: ../upstream/opensearch
+    version: 2.6.0
+    wait: true
+
+  opensearchMaster:
+    name: opensearch-master
+    inherit:
+      - template: opensearch
+    needs:
+      {{- if .Values | get "opensearch.sso.enabled" false }}
+      - dex/dex
+      {{- end }}
+      - opensearch-system/opensearch-secrets
+    values:
+      - ../values/opensearch/common.yaml.gotmpl
+      - ../values/opensearch/master.yaml.gotmpl
+
+  opensearchData:
+    name: opensearch-data
+    installed: {{ .Values | get "opensearch.dataNode.dedicatedPods" false }}
+    inherit:
+      - template: opensearch
+    needs:
+      - opensearch-system/opensearch-master
+    values:
+      - ../values/opensearch/common.yaml.gotmpl
+      - ../values/opensearch/data.yaml.gotmpl
+
+  opensearchClient:
+    name: opensearch-client
+    installed: {{ .Values | get "opensearch.clientNode.dedicatedPods" false }}
+    inherit:
+      - template: opensearch
+    needs:
+      - opensearch-system/opensearch-master
+    values:
+      - ../values/opensearch/common.yaml.gotmpl
+      - ../values/opensearch/client.yaml.gotmpl
+
+  opensearchDashboards:
+    name: opensearch-dashboards
+    namespace: opensearch-system
+    condition: ck8sServiceCluster.enabled
+    chart: ../upstream/opensearch-dashboards
+    version: 2.5.1
+    wait: true
+    needs:
+      - opensearch-system/opensearch-master
+    values:
+      - ../values/opensearch/dashboards.yaml.gotmpl
+
+  opensearchSecurityadmin:
+    name: opensearch-securityadmin
+    namespace: opensearch-system
+    condition: ck8sServiceCluster.enabled
+    installed: {{ .Values | get "opensearch.securityadmin.enabled" false }}
+    chart: ../charts/opensearch/securityadmin
+    version: 0.1.0
+    needs:
+      - opensearch-system/opensearch-master
+      {{- if .Values | get "opensearch.dataNode.dedicatedPods" false }}
+      - opensearch-system/opensearch-data
+      {{- end }}
+      {{- if .Values | get "opensearch.clientNode.dedicatedPods" false }}
+      - opensearch-system/opensearch-client
+      {{- end }}
+    values:
+      - ../values/opensearch/securityadmin.yaml.gotmpl
+
+  opensearchConfigurer:
+    name: opensearch-configurer
+    namespace: opensearch-system
+    condition: ck8sServiceCluster.enabled
+    chart: ../charts/opensearch/configurer
+    version: 0.1.0
+    needs:
+      {{- if .Values | get "opensearch.securityadmin.enabled" false }}
+      - opensearch-system/opensearch-securityadmin
+      {{- else }}
+      - opensearch-system/opensearch-master
+      {{- end }}
+      - opensearch-system/opensearch-dashboards
+    values:
+      - ../values/opensearch/securityadmin.yaml.gotmpl
+      - ../values/opensearch/configurer.yaml.gotmpl
+
+  opensearchCurator:
+    name: opensearch-curator
+    namespace: opensearch-system
+    condition: ck8sServiceCluster.enabled
+    installed: {{ .Values | get "opensearch.curator.enabled" false }}
+    chart: ../charts/opensearch/curator
+    version: 0.1.0
+    needs:
+      - opensearch-system/opensearch-configurer
+    values:
+      - ../values/opensearch/curator.yaml.gotmpl
+
+  opensearchBackup:
+    name: opensearch-backup
+    namespace: opensearch-system
+    condition: ck8sServiceCluster.enabled
+    installed: {{ .Values | get "opensearch.snapshot.enabled" false }}
+    chart: ../charts/opensearch/backup
+    version: 0.1.0
+    needs:
+      - opensearch-system/opensearch-configurer
+    values:
+      - ../values/opensearch/backup.yaml.gotmpl
+
+  opensearchSlm:
+    name: opensearch-slm
+    namespace: opensearch-system
+    condition: ck8sServiceCluster.enabled
+    installed: {{ .Values | get "opensearch.snapshot.enabled" false }}
+    chart: ../charts/opensearch/slm
+    version: 0.1.0
+    needs:
+      - opensearch-system/opensearch-configurer
+    values:
+      - ../values/opensearch/slm.yaml.gotmpl

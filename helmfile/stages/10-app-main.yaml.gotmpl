@@ -1,0 +1,19 @@
+bases:
+  - ../bases/defaults.yaml.gotmpl
+---
+bases:
+  - ../stacks/opensearch.yaml.gotmpl
+
+commonLabels:
+  stage: app-main
+
+releases:
+  - inherit: [ template: opensearchSecrets ]
+  - inherit: [ template: opensearchMaster ]
+  - inherit: [ template: opensearchData ]
+  - inherit: [ template: opensearchClient ]
+  - inherit: [ template: opensearchSecurityadmin ]
+  - inherit: [ template: opensearchConfigurer ]
+  - inherit: [ template: opensearchCurator ]
+  - inherit: [ template: opensearchBackup ]
+  - inherit: [ template: opensearchSlm ]
