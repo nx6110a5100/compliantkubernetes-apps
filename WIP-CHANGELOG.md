@@ -16,7 +16,7 @@
 - Compaction for logs stored directly in object store by Fluentd
 - New 'Log review overview' Opensearch dashboard
 - Added falco rules to ignore redis operator related alerts.
-
+- Add PrometheusRule to alert packets to/from workloads are dropped.
 ### Fixed
 
 - The update-ips script can now fetch Calico Wireguard IPs
